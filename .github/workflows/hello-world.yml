@@ -1,15 +1,37 @@
 ---
 # A not so empty hello-world.yml file.
 
+env:
+  docker_username: ${{ github.actor }}
+  docker_password: ${{ secrets.GITHUB_TOKEN }}
+  GIT_COMMIT: ${{ github.sha }}
+
 name: hello-world
 on: push
 jobs:
-  my-job:
+  Clone-repo:
+    name: Clone repository
     runs-on: ubuntu-latest
     container: gradle:6-jdk11
     steps:
-      - name: Clone repository
+      - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Upload repository
+        uses: actions/upload-artifact@v3
+        with:
+          name: code
+          path: .
+
+  Build:
+    runs-on: ubuntu-latest
+    needs: Clone-repo
+    container: gradle:6-jdk11
+    steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
       - name: Build application
         run: ci/build-app.sh
       - name: Run test
@@ -20,5 +42,21 @@ jobs:
           name: code
           path: .
         
+  Docker-image:
+    runs-on: ubuntu-latest
+    needs: [Build]
+    permissions:
+      packages: write
+    steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
+      - name: Build docker
+        run: ci/build-docker.sh
+      - name: Push docker
+        run: ci/push-docker.sh
+
 
 ...
