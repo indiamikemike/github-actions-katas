@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     container: gradle:6-jdk11
     steps:
-      - uses: Clone-down
-        action: actions/checkout@v3
+      - name: Clone-down
+        uses: actions/checkout@v3
       - name: my-step
         run: ci/build-app.sh
 
