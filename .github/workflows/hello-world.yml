@@ -1,1 +1,13 @@
-# An empty hello-world.yml file.
+---
+# A not so empty hello-world.yml file.
+
+name: hello-world
+on: push
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: only-step
+        run: echo "Hello World!"
+
+...
